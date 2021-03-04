@@ -18,20 +18,24 @@ app.set("view engine", "ejs");
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static("public"));
-
-mongoose.connect("mongodb://localhost:27017/blogDB", {
+// Creating database connection
+var mongoDB = "mongodb://localhost:27017/blogDB";
+mongoose.connect(mongoDB, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
   useFindAndModify: false,
 });
 
+// postSchema with title and content
 const postSchema = {
   title: String,
   content: String,
 };
 
+// mongoose model using schema to define your posts collection.
 const Post = mongoose.model("Post", postSchema);
 
+// home route selecting all post to the home page
 app.get("/", function (req, res) {
   Post.find({}, function (err, posts) {
     res.render("home", {
@@ -41,6 +45,7 @@ app.get("/", function (req, res) {
   });
 });
 
+// show the compose page
 app.get("/compose", function (req, res) {
   res.render("compose");
 });
@@ -50,7 +55,7 @@ app.post("/compose", function (req, res) {
     title: req.body.postTitle,
     content: req.body.postBody,
   });
-
+  // save the post form the compose page.
   post.save(function (err) {
     if (!err) {
       res.redirect("/");
@@ -58,6 +63,7 @@ app.post("/compose", function (req, res) {
   });
 });
 
+// select post by id
 app.get("/posts/:postId", function (req, res) {
   const requestedPostId = req.params.postId;
 
@@ -69,10 +75,12 @@ app.get("/posts/:postId", function (req, res) {
   });
 });
 
+// show about page
 app.get("/about", function (req, res) {
   res.render("about", { aboutContent: aboutContent });
 });
 
+// show contact page
 app.get("/contact", function (req, res) {
   res.render("contact", { contactContent: contactContent });
 });
